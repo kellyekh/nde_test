@@ -1,0 +1,12 @@
+{
+  "configurationparameters": {
+    "queueName": "hancockcolleges-queue",
+    "snippetId": 9887
+    
+  },
+  "features": {
+    "iconOnlineColor": "#033E5A",
+    "iconOfflineColor": "#000000",
+    "iconSize": "75px"
+  }
+}
