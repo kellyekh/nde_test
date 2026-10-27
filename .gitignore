@@ -2,3 +2,5 @@
 Thumbs.db
 *.zip
 .claude/
+node_modules/
+__MACOSX/

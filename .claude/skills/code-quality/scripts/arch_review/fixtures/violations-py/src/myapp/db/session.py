@@ -1,2 +1,0 @@
-def persist(obj):
-    pass
