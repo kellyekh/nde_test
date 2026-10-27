@@ -1,0 +1,965 @@
+:root {
+    --sys-primary: #003E5A;
+    }
+    a#Textbooks_link span, a#Search_Tips_link span, a#Databases_link span, a#Technology_link span, a#Archives_link span, a#Textbooks_link:link, a#Search_Tips_link:link, a#Databases_link:link, a#Technology_link:link, a#Archives_link:link {
+        text-decoration: none !important;
+        color:#003E5A !important
+    }
+
+
+/* Hide all breadcrumb links except the last one */
+nde-collection-path-breadcrumbs .collection-path:not(:last-of-type),
+nde-collection-path-breadcrumbs span {
+display: none !important;
+}
+
+/* Hide first breadcrumb */
+nde-collection-path-breadcrumbs .collection-path:first-of-type {
+display: none !important;
+}
+
+/* Hide all separators */
+nde-collection-path-breadcrumbs span {
+display: none !important;
+}
+
+/*Search Customization */
+.container .custom-search-bar-container {
+  background-color: #003E5A;
+  height: 10rem !important;
+}
+
+.top-bar-background-image {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  width: stretch !important;
+  /* Primo inlines homepage_background.svg here and scales it with
+     "cover", which leaves thin gaps at the screen edges and pulls a much
+     larger image than the banner shows. Overriding it means the browser
+     never downloads the SVG: this repeats a small shelf photo across the
+     full width at the banner's height instead. */
+  background-image: url("../images/homepage_background.jpg") !important;
+  background-size: auto 100% !important;
+  background-repeat: repeat-x !important;
+  background-position: center center !important;
+}
+
+/* Phone header: Primo's menu button + our 253px logo + the language/
+   account panel, each with 36px margins, add up to ~500px -- wider than
+   a phone. That made the whole page scroll sideways, so the banner
+   looked like it stopped short of the right edge. Shrink the logo to fit
+   the space left over and tighten the margins. */
+@media (max-width: 599px) {
+  .header-container > div,
+  nde-logo {
+    min-width: 0;
+  }
+  nde-logo.margin-left-huge {
+    margin-left: 8px !important;
+  }
+  nde-logo img {
+    width: min(253px, calc(100vw - 205px)) !important;
+    height: auto !important;
+  }
+  nde-user-panel.margin-right-huge {
+    margin-right: 8px !important;
+  }
+}
+
+/* Homepage quick-link tiles: single-word labels like "Technology" can't
+   wrap, so on narrower screens they spilled out of their boxes. Less
+   side padding and smaller text below 900px, then 3 columns, then 2 on
+   phones (the odd last tile spans the row). These live here rather than
+   in homepage.css because that file is SCSS and its responsive rules
+   never reach the live page (see the WORKAROUND note further down). */
+.main-landing-page .menu-container .menu li a {
+  padding-inline: .5rem !important;
+}
+@media (max-width: 899px) {
+  .main-landing-page .menu-container .menu li a span {
+    font-size: 1rem !important;
+  }
+}
+@media (max-width: 767px) {
+  .main-landing-page .menu-container .menu {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-row-gap: 1rem !important;
+  }
+}
+@media (max-width: 479px) {
+  .main-landing-page .menu-container .menu {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .main-landing-page .menu-container .menu li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .main-landing-page .menu-container .menu li a .icon {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+}
+
+/* Homepage on phones: desktop-sized gaps (80px above the tiles and
+   between sections) left long stretches of empty screen. The Featured
+   Collection card's fixed 20rem width also stopped short of the right
+   edge once the columns stack. */
+@media (max-width: 599px) {
+  .home-page-container {
+    margin-top: 2rem !important;
+  }
+  .main-landing-page {
+    gap: 2.5rem !important;
+  }
+  .featured-collection-card {
+    width: 100%;
+  }
+}
+
+/* "Check out something new" slider on smaller screens: 4 slides per
+   view (.welcome .book-slide below) made each card ~86px wide, so covers
+   were ~38px and titles wrapped one word per line. Show 3 below 768px
+   and 2 on phones -- getVisibleCount() in custom.js measures the real
+   slide width, so the arrows still step one card at a time. Titles are
+   capped at 4 lines (the full title is still the link's text for screen
+   readers), and the dots get their own row so the arrows and Pause
+   don't wrap awkwardly around them. */
+@media (max-width: 767px) {
+  .welcome .book-slide {
+    flex: 0 0 33.3333% !important;
+  }
+  .main-landing-page .welcome-announcements-container .welcome a.book-slide-link {
+    padding: .5rem !important;
+  }
+  .book-slide-book-title {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .book-slider-dots {
+    flex-basis: 100%;
+    justify-content: center;
+    order: -1;
+  }
+}
+@media (max-width: 479px) {
+  .welcome .book-slide {
+    flex: 0 0 50% !important;
+  }
+}
+
+.custom-search-bar-container h1 {
+  display: none !important;
+}
+
+.custom-search-bar-container .background-overlay {
+display: none;
+}
+
+.container .custom-search-bar-container {
+  background-color: #003E5A;
+  height: 15rem;
+}
+.mat-title-medium, .mat-typography .mat-title-medium {
+  color:#003E5A;
+  font-size: 28px !important;
+  /* Primo's 24px line height is shorter than 28px text, and the
+     full-record section headers (Requests, Locations, Details...) clip
+     overflow -- cutting off descenders like the "q" in Requests. */
+  line-height: 1.3 !important;
+}
+
+.main-landing-page  .welcome-announcements-container  .welcome .welcome-title {
+  color:#003E5A;
+}
+
+.main-landing-page  .welcome-announcements-container  .welcome .welcome-content {
+  color:#003E5A;
+}
+
+.icon display-flex icon-color {
+  flex: none;
+}
+
+.icon-color mask {
+  rect{
+    fill: none;}
+  }
+
+  /*Sign-in container */
+  .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    background-color: yellow;
+  }
+
+  :root .nde-overrides {
+    --mdc-snackbar-container-color: yellow;
+  }
+
+.mat-snack-bar-container .mat-mdc-snack-bar-container {
+  position: static; 
+  margin-top: 0px; 
+  margin-right: 0px;
+}
+
+/*Footer styling */
+#footer{
+  background: #003E5A;
+  padding: 15px 0;
+  margin-top: 0;
+  color: #ffffff;
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 10px;
+  line-height: 11px;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+
+ #footer.container{
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-bottom: 30px;
+    padding-top: 30px;
+  }
+
+ #footer.row{
+    padding-top: 1em;
+    padding-bottom: 1em;
+  }
+
+#footer.links{
+  text-align: right;
+  margin-top: 10px;
+}
+
+#footer.liinks ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#footer .links ul li{
+  border-color: #003E5A;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #ffffff;
+  text-transform: uppercase;
+  padding-right: 20px;
+  border-right: solid 1px #ffffff;
+  margin-right: 20px;
+  display: inline-block;
+}
+#footer .links ul li:last-child {
+  padding-right: 0;
+  margin-right: 0;
+  border-right: none;
+}
+#footer .links ul li a {
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: 1px;
+}
+#footer .links ul li a:hover,
+#footer .links ul li a:focus {
+  color: #b3c5ce;
+  text-decoration: none;
+}
+
+/* Report a problem styling */
+button[data-qa="report_a_problem_button"].mat-mdc-mini-fab, nde-back-to-top button.back-to-top-button.mat-mdc-mini-fab
+nde-back-to-top button.back-to-top-button.mat-mdc-mini-fab {
+    width: 60px;
+    height: 60px;
+    background-color: black;
+    color: yellow !important;
+}
+mat-icon[data-mat-icon-name="report-a-problem-button"] svg path {
+    fill: yellow !important;
+}
+/* "Tune" is the All Filters icon, which sits on white -- brand blue
+   rather than yellow so it's visible. */
+mat-icon[data-mat-icon-name="Tune"] svg path {
+    fill: #003e5a !important;
+}
+button[data-qa="report_a_problem_button"] mat-icon {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+/* Larger user account icon in the header (default is 24px in a 40px
+   button); the button grows to 48px so the icon keeps its padding. */
+button.user-area-btn {
+    width: 48px !important;
+    height: 48px !important;
+    padding: 8px !important;
+}
+button.user-area-btn mat-icon[data-mat-icon-name="User-account"] {
+    width: 32px !important;
+    height: 32px !important;
+}
+/* Primo's icon-button styles size the SVG itself at 24px, so make it
+   fill the enlarged icon box too. */
+button.user-area-btn mat-icon[data-mat-icon-name="User-account"] svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+/* Brand blue instead of Primo's default grey */
+button.user-area-btn mat-icon[data-mat-icon-name="User-account"] svg path {
+    fill: #003e5a !important;
+}
+/* Signed in, Primo swaps the icon for an initials circle (24px, 12px
+   text); scale it to match the 32px signed-out icon. */
+button.user-area-btn.user-area-logged-in > span.ng-star-inserted {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+    align-items: center;
+    justify-content: center;
+}
+
+mat-mdc-icon-button svg {
+    width: var(--mdc-icon-button-icon-size, 40px !important);
+    height: var(--mdc-icon-button-icon-size, 40px !important);
+}
+
+/* footer */
+footer {
+  background-color: #003E5A;
+  border-top: 2px solid var(--sys-on-secondary-fixed);
+  margin-top:40px;
+}
+
+#subfooter {
+  background-color: #003e5a;
+  /* padding-left:2rem; */
+}
+
+#subfooter a:link, #subfooter a:visited {
+  color: #fff;
+  text-decoration: none;
+}
+
+#subfooter a:hover, #subfooter a:focus {
+  text-decoration: underline;
+}
+
+#subfooter-directory {
+  gap: 1rem;
+}
+/* Footer links: centered as a group, matching the logo's centering above it */
+.subfooter-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* Featured Collection announcement box: Hispanic American Heritage Collection */
+
+/* Fixed width (rather than sized by content) so the Welcome column
+   beside it can't squeeze it narrow. */
+.featured-collection-card {
+  flex: 0 0 auto;
+  width: 20rem;
+  max-width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: inherit;
+  margin: 1rem 0;
+}
+
+.featured-collection-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* The card's overflow:hidden clips the link's own focus ring, so draw
+   the ring on the card itself when its link has keyboard focus. */
+.featured-collection-card:has(.featured-collection-link:focus-visible) {
+  outline: 3px solid #003e5a;
+  outline-offset: 2px;
+}
+
+.featured-collection-link:focus-visible {
+  outline: none;
+}
+
+.featured-collection-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.featured-collection-body {
+  padding: 0.75rem 1rem;
+}
+
+.featured-collection-title {
+  margin: 0 0 0.25rem;
+  font-size: 28px !important;
+}
+
+.featured-collection-description {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.featured-collection-cta {
+  margin: 0;
+  font-size: 0.95rem;
+  text-decoration: underline;
+}
+/* Featured Books Slider
+   Matches the site's existing brand color (#003E5A) used in the footer. */
+
+.book-slider {
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: inherit;
+}
+
+.book-slider-header {
+  margin-bottom: 1rem;
+}
+
+.book-slider-title {
+  margin: 0;
+  /* !important: a Primo h2 style otherwise makes this ~45px (same
+     reason .featured-collection-title uses it). */
+  font-size: 28px !important;
+  color: #003e5a;
+}
+
+/* Sized to its text and left-aligned, like the Ask a Librarian button,
+   rather than spanning the slider; the pill styling comes from the
+   homepage's `.welcome a` rule. */
+.book-slider-view-all {
+  display: block;
+  width: fit-content;
+  margin: 1rem 0 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Viewport clips the track; the track itself holds all slides in a row
+   and is moved left/right by the JS setting transform: translateX(...). */
+.book-slider-viewport {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.book-slider-track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  transition: transform 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-slider-track {
+    transition: none;
+  }
+}
+
+.book-slide {
+  flex: 0 0 100%;
+  min-width: 0; /* let long titles wrap instead of widening the slide */
+  box-sizing: border-box;
+  padding: 0 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .book-slide {
+    flex: 0 0 50%;
+  }
+}
+
+@media (min-width: 900px) {
+  .book-slide {
+    flex: 0 0 33.3333%;
+  }
+}
+
+.book-slide-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* The homepage's `.welcome a` rule gives every link inside .welcome a
+   2rem pill radius, which out-ranks the rule above. Match the Featured
+   Collection card's 8px corners instead. */
+.main-landing-page .welcome-announcements-container .welcome a.book-slide-link {
+  border-radius: 8px;
+}
+
+.book-slide-link:hover,
+.book-slide-link:focus {
+  border-color: #003e5a;
+}
+
+/* Keyboard focus ring drawn INSIDE the card: the viewport's
+   overflow:hidden would clip a ring drawn outside it. Gold reads
+   clearly against the card's dark blue. Out-ranks the homepage's
+   `.welcome a:focus` rule, which removes the outline. */
+.main-landing-page .welcome-announcements-container .welcome a.book-slide-link:focus-visible {
+  outline: 3px solid #f2b807;
+  outline-offset: -3px;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------
+   Cover sizing when nested inside .welcome
+   --------------------------------------------------------------------
+   Now that 4 slides show at once (each a quarter of the column width),
+   the base .book-slide-cover rule below (width: 100% of its own slide)
+   already renders each cover at an appropriately compact size with no
+   extra cap needed -- unlike the earlier single-full-width-slide
+   version, where 100% meant the whole column and produced a huge cover
+   with lots of surrounding blank space. */
+
+/* Stop Featured Collection from stretching to match whatever height
+   the slider ends up needing -- each column should size to its own
+   content only, not its sibling's. */
+.main-landing-page .welcome-announcements-container {
+  align-items: flex-start;
+}
+
+.book-slide-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background-color: #f2f2f2;
+}
+
+.book-slide-info {
+  display: block;
+  padding: 0.75rem;
+}
+
+.book-slide-book-title {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.book-slide-author {
+  display: block;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Controls */
+.book-slider-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.book-slider-arrow {
+  background-color: #003e5a;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.book-slider-arrow:hover,
+.book-slider-arrow:focus {
+  background-color: #002a3d;
+}
+
+.book-slider-dots {
+  display: flex;
+}
+
+/* Each dot button is a 24x24px tap target (WCAG 2.5.8); the visible
+   dot is a smaller circle drawn in its center. */
+.book-slider-dots button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.book-slider-dots button::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px solid #003e5a;
+  background-color: #fff;
+}
+
+.book-slider-dots button[aria-current="true"]::before {
+  background-color: #003e5a;
+}
+
+.book-slider-pause {
+  background: none;
+  border: 1px solid #003e5a;
+  color: #003e5a;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.book-slider-pause:hover,
+.book-slider-pause:focus {
+  background-color: #003e5a;
+  color: #fff;
+}
+
+/* Visible keyboard focus for the slider's controls. Dark blue rather
+   than gold, since gold on the white page background is too faint. */
+.book-slider a:focus-visible,
+.book-slider button:focus-visible {
+  outline: 3px solid #003e5a;
+  outline-offset: 2px;
+}
+
+/* Clear keyboard focus ring for the five menu icon links; their only
+   built-in focus effect is a faint 10%-opacity shadow. */
+.main-landing-page .menu-container .menu li a:focus-visible {
+  outline: 3px solid #003e5a;
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------
+   Placement override: slider nested inside the homepage's Welcome column
+   --------------------------------------------------------------------
+   When the slider sits inside .welcome (stacked under the "Ask a
+   Librarian" button, beside the Featured Collection card), it has much
+   less horizontal room than when placed full-width elsewhere on the
+   page. The default rules above size slides off browser VIEWPORT width
+   (640px/900px breakpoints), which assumes the slider has the whole
+   page to itself -- inside a narrow column that assumption breaks.
+   This override wins by specificity (two classes vs. one) regardless
+   of viewport size, so nested-in-Welcome always shows 4 books at a time,
+   each filling an even quarter of whatever width .welcome ends up being.
+   Used standalone (outside .welcome) the slider keeps its normal
+   responsive 1/2/3-up behavior untouched.
+
+   getVisibleCount() in custom.js measures the real rendered slide width
+   at runtime rather than guessing, so it automatically detects "4
+   visible" from this rule with no JS changes needed if this number
+   changes again later -- only this flex-basis (25% = 4 slides) needs
+   updating to show a different count. */
+.welcome .book-slider {
+  max-width: 100%;
+  margin: 0;
+}
+
+.welcome .book-slide {
+  flex: 0 0 25%;
+}
+prm-person-entity-page .person-full-view-cont:has(a[href="https://en.wikipedia.org/?curid=18934"]) .avatar-img,
+     prm-person-entity-page .person-full-view-cont:has(a[href="https://en.wikipedia.org/?curid=496253"]) .avatar-img {
+       display: none;
+     }
+     prm-linked-data-card div.person-data-grid-cont:has(span[translate="nui.personEntity.birthDate"]),
+     prm-person-entity-page div.person-data-grid-cont:has(span[translate="nui.personEntity.birthDate"]) {
+       display: none;
+     }
+
+/* --------------------------------------------------------------------
+   WORKAROUND: .welcome min-width fix, duplicated here from homepage.css
+   --------------------------------------------------------------------
+   This same rule was added to homepage.css, but dev tools confirmed it
+   never actually reached the live page (no min-width property appears
+   on .welcome at all in the Computed panel, even with "Show all"
+   checked) -- meaning homepage.css has a deployment gap somewhere,
+   separate from anything wrong with the CSS itself. Since custom.css IS
+   confirmed to reach the live page (the book-slider styling above,
+   footer fixes, and featured-collection styling all render correctly
+   from this file), adding it here as well guarantees it takes effect
+   while that deployment question gets sorted out separately.
+
+   Selector specificity intentionally matches what the nested SCSS in
+   homepage.css would compile to (three chained class selectors), so
+   this doesn't lose a specificity tie if homepage.css ever does start
+   loading correctly alongside this file. If/when that gets resolved,
+   this block can be removed to avoid maintaining the same rule in two
+   places. */
+.main-landing-page .welcome-announcements-container .welcome {
+  min-width: 0;
+}
+
+/* Welcome takes whatever width the Featured Collection card leaves,
+   instead of sizing itself to its content -- the slider's 30 slides
+   (10 books + loop clones) would otherwise claim nearly the whole row.
+   width: 100% keeps it inside the page when the columns stack on
+   small screens (it has no effect side by side, where flex wins). */
+.main-landing-page .welcome-announcements-container .welcome {
+  flex: 1 1 0;
+  width: 100%;
+}
+/* --------------------------------------------------------------------
+   Search results: per-record action icons (Bookmark, Citation, Export,
+   Share). Brand blue and slightly larger than Primo's default 24px grey
+   so they stand out; the button grows to keep the icon padded.
+   -------------------------------------------------------------------- */
+nde-record-actions button.mat-mdc-icon-button {
+    width: 44px !important;
+    height: 44px !important;
+    padding: 8px !important;
+}
+nde-record-actions button.mat-mdc-icon-button mat-icon,
+nde-record-actions button.mat-mdc-icon-button mat-icon svg {
+    width: 28px !important;
+    height: 28px !important;
+}
+nde-record-actions button.mat-mdc-icon-button mat-icon svg path {
+    fill: #003e5a !important;
+}
+
+/* --------------------------------------------------------------------
+   Record page: "Please sign in to check if there are additional request
+   options" notice in the Requests section. Larger message text and a
+   filled brand-blue Sign in button (like Ask a Librarian) so it reads
+   as a call to action rather than a faint link. Scoped with :has() to
+   the notice containing the Login icon, so other notices are untouched.
+   -------------------------------------------------------------------- */
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) .notification-text {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1b1b20;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button {
+    background-color: #003e5a !important;
+    color: #fff !important;
+    padding: 0 20px !important;
+    height: 40px !important;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button .mdc-button__label {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    white-space: nowrap;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button mat-icon {
+    width: 20px !important;
+    height: 20px !important;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button mat-icon svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button mat-icon svg path {
+    fill: #fff !important;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button:hover {
+    background-color: #002a3d !important;
+}
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) button.mat-mdc-button:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+
+/* Optional: light blue-grey panel behind the notice. Delete this rule
+   to drop the background and keep just the larger text and button. */
+nde-requests nde-notification:has(mat-icon[data-mat-icon-name="Login"]) .notification-container {
+    background-color: #e6eef2;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+/* --------------------------------------------------------------------
+   Record page, signed in: Request card in the Requests section. Matches
+   the signed-out sign-in notice above -- same blue-grey panel, 16px
+   medium text, and filled brand-blue button with 16px bold label.
+   -------------------------------------------------------------------- */
+nde-request-card mat-card.request-card {
+    background-color: #e6eef2 !important;
+    border-radius: 8px !important;
+}
+nde-request-card .request-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1b1b20;
+}
+nde-request-card .request-description {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    color: #1b1b20;
+}
+nde-request-card button.request-button {
+    background-color: #003e5a !important;
+    color: #fff !important;
+    padding: 0 20px !important;
+    height: 40px !important;
+}
+nde-request-card button.request-button .mdc-button__label {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    white-space: nowrap;
+}
+nde-request-card button.request-button:hover {
+    background-color: #002a3d !important;
+}
+nde-request-card button.request-button:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+
+/* Full record: "Learn more" link added by custom.js after the
+   consortium's Report Harmful Language link -- match NDE's link style */
+.harmful-language-learn-more a {
+    color: #003e5a;
+    font-weight: 500;
+    text-decoration: none;
+}
+.harmful-language-learn-more a:hover {
+    text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------
+   Record page: "Check for Online Access" steps added to the Requests
+   section by custom.js. Each step is a card styled like the Request
+   card and sign-in notice above -- blue-grey panel, 16px text, and a
+   filled brand-blue button with a 16px bold label.
+   -------------------------------------------------------------------- */
+.ahc-online-steps-hidden {
+    display: none !important;
+}
+.ahc-online-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+.ahc-online-steps-intro {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1b1b20;
+}
+.ahc-online-step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    background-color: #e6eef2;
+    border-radius: 8px;
+    padding: 16px 20px;
+}
+.ahc-online-step-text {
+    flex: 1 1 280px;
+}
+.ahc-online-step-title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #1b1b20;
+}
+.ahc-online-step-number {
+    font-weight: 700;
+    color: #003e5a;
+}
+.ahc-online-step-description {
+    margin-top: 2px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #44474e;
+}
+.ahc-online-step-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    background-color: #003e5a;
+    color: #fff !important;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none !important;
+}
+.ahc-online-step-button svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+}
+.ahc-online-step-button:hover {
+    background-color: #002a3d;
+}
+.ahc-online-step-button:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------
+   Record page, signed in: "No available request options" notice in the
+   Requests section. custom.js hides NDE's message (ahc-no-requests-
+   original) and adds its own notice and "let us know" line after it.
+   Same blue-grey panel and 16px medium text as the sign-in notice above.
+   -------------------------------------------------------------------- */
+nde-requests .ahc-no-requests-original {
+    display: none !important;
+}
+nde-requests .ahc-no-requests {
+    display: block !important;
+    background-color: #e6eef2;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+nde-requests .ahc-no-requests-text {
+    display: block;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1b1b20;
+}
+nde-requests .ahc-no-requests-help {
+    margin-top: 4px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #1b1b20;
+}
+nde-requests .ahc-no-requests-help a {
+    color: #003e5a;
+    font-weight: 700;
+    text-decoration: underline;
+}
+nde-requests .ahc-no-requests-help a:hover {
+    color: #002a3d;
+}
+nde-requests .ahc-no-requests-help a:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}

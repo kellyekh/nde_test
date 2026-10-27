@@ -1,0 +1,471 @@
+#!/usr/bin/env bash
+# detect-linter.sh — Auto-detect project linter and output key=value config
+# Usage: detect-linter.sh [project-path] [--changed-only] [--help]
+
+set -euo pipefail
+
+# Resolve skill directory paths for default configs
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_DIR="$(dirname "$SCRIPT_DIR")"
+DEFAULTS_DIR="$SKILL_DIR/defaults"
+
+# --- Help ---
+if [[ "${1:-}" == "--help" ]]; then
+  cat <<'USAGE'
+Usage: detect-linter.sh [project-path] [--changed-only]
+
+Auto-detects the linter for a project and outputs key=value pairs:
+
+  TOOL              - Linter name (eslint, biome, ruff, pylint, npm-script)
+  COMMAND           - Full command to run analysis with JSON output
+  FIX_COMMAND       - Full command to auto-fix issues
+  CONFIG            - Path to detected config file (empty if fallback)
+  LANGUAGE          - Primary language (javascript, python)
+  TYPESCRIPT        - "true" if a tsconfig.json exists at the project root
+  FALLBACK          - "true" if no explicit config found
+  PROJECT_ROOT      - Detected project root directory
+  FRAMEWORK         - Detected framework (nextjs, nestjs, django, fastapi, flask, express, none)
+  FILES             - Space-separated file list (only with --changed-only)
+  TYPE_CHECKER      - Type checker (pyright, tsc, none)
+  TYPE_CHECK_COMMAND - Full command to run type checking
+  COGNITIVE_COMMAND - Command for cognitive complexity, per LANGUAGE
+  SEMGREP_AVAILABLE - "true" if uvx is on PATH for Security Scan
+  SECRETS_TOOL      - Secret scanner: detect-secrets, gitleaks, or none
+  ESLINT_DEFAULTS_CMD - Wrapper that runs the skill's bundled ESLint+sonarjs
+
+Options:
+  --changed-only  Only list files changed in git (staged + unstaged)
+  --help          Show this help message
+USAGE
+  exit 0
+fi
+
+# --- Args ---
+CHANGED_ONLY=false
+PROJECT_PATH=""
+for arg in "$@"; do
+  case "$arg" in
+    --changed-only) CHANGED_ONLY=true ;;
+    --*) ;; # skip unknown flags
+    *) [[ -z "$PROJECT_PATH" ]] && PROJECT_PATH="$arg" ;;
+  esac
+done
+PROJECT_PATH="${PROJECT_PATH:-.}"
+
+# Resolve to absolute path
+PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
+
+# --- Find project root ---
+find_project_root() {
+  local dir="$1"
+  while [[ "$dir" != "/" ]]; do
+    for marker in .git package.json go.mod pyproject.toml; do
+      [[ -e "$dir/$marker" ]] && echo "$dir" && return
+    done
+    dir="$(dirname "$dir")"
+  done
+  # No root found, use the given path
+  echo "$1"
+}
+
+PROJECT_ROOT="$(find_project_root "$PROJECT_PATH")"
+
+# --- Helpers ---
+has_file() { [[ -f "$PROJECT_ROOT/$1" ]]; }
+has_glob() { compgen -G "$PROJECT_ROOT/$1" >/dev/null 2>&1; }
+
+# Check if package.json has a key in devDependencies or dependencies
+pkg_has_dep() {
+  local dep="$1"
+  [[ -f "$PROJECT_ROOT/package.json" ]] || return 1
+  node -e "
+    const pkg = require('$PROJECT_ROOT/package.json');
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    process.exit(deps['$dep'] ? 0 : 1);
+  " 2>/dev/null
+}
+
+# Check if package.json scripts contain a lint command
+pkg_has_lint_script() {
+  [[ -f "$PROJECT_ROOT/package.json" ]] || return 1
+  node -e "
+    const pkg = require('$PROJECT_ROOT/package.json');
+    const scripts = pkg.scripts || {};
+    const has = Object.keys(scripts).some(k => k === 'lint' || k === 'lint:check');
+    process.exit(has ? 0 : 1);
+  " 2>/dev/null
+}
+
+# Check if pyproject.toml contains a section
+pyproject_has_section() {
+  local section="$1"
+  [[ -f "$PROJECT_ROOT/pyproject.toml" ]] || return 1
+  grep -qE "^\[${section//./\\.}\]" "$PROJECT_ROOT/pyproject.toml" 2>/dev/null
+}
+
+# Detect framework. Priority: nextjs > nestjs > django > fastapi > flask > express.
+# Used by Architecture Review.
+detect_framework() {
+  local root="$1"
+
+  if compgen -G "$root/next.config.*" >/dev/null 2>&1; then
+    echo "nextjs"
+    return
+  fi
+  if [ -f "$root/nest-cli.json" ]; then
+    echo "nestjs"
+    return
+  fi
+  if [ -f "$root/manage.py" ] && find "$root" -maxdepth 3 -name 'settings.py' -print -quit | grep -q .; then
+    echo "django"
+    return
+  fi
+  if [ -f "$root/pyproject.toml" ] && grep -qE '(^|[^a-zA-Z_])fastapi([^a-zA-Z_]|$)' "$root/pyproject.toml" 2>/dev/null; then
+    echo "fastapi"
+    return
+  fi
+  if [ -f "$root/requirements.txt" ] && grep -qE '^fastapi([=<>!~]|$)' "$root/requirements.txt" 2>/dev/null; then
+    echo "fastapi"
+    return
+  fi
+  if [ -f "$root/pyproject.toml" ] && grep -qE '(^|[^a-zA-Z_])flask([^a-zA-Z_]|$)' "$root/pyproject.toml" 2>/dev/null; then
+    echo "flask"
+    return
+  fi
+  if [ -f "$root/requirements.txt" ] && grep -qE '^flask([=<>!~]|$)' "$root/requirements.txt" 2>/dev/null; then
+    echo "flask"
+    return
+  fi
+  if [ -f "$root/package.json" ] && grep -q '"express"' "$root/package.json" 2>/dev/null; then
+    echo "express"
+    return
+  fi
+  echo "none"
+}
+
+# --- Changed files ---
+get_changed_files() {
+  local exts="$1"
+  local files=""
+  if command -v git >/dev/null 2>&1 && git -C "$PROJECT_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+    files=$(cd "$PROJECT_ROOT" && {
+      git diff --name-only 2>/dev/null
+      git diff --cached --name-only 2>/dev/null
+    } | sort -u)
+  fi
+  # Filter by extensions
+  local filtered=""
+  for f in $files; do
+    for ext in $exts; do
+      if [[ "$f" == *".$ext" ]]; then
+        filtered="$filtered $f"
+        break
+      fi
+    done
+  done
+  echo "$filtered" | xargs
+}
+
+# --- Detection ---
+detect_javascript() {
+  local tool="" cmd="" fix_cmd="" config="" fallback="false"
+
+  # 1. package.json lint script
+  if pkg_has_lint_script; then
+    local pkg_manager="npm"
+    [[ -f "$PROJECT_ROOT/yarn.lock" ]] && pkg_manager="yarn"
+    [[ -f "$PROJECT_ROOT/pnpm-lock.yaml" ]] && pkg_manager="pnpm"
+    [[ -f "$PROJECT_ROOT/bun.lockb" || -f "$PROJECT_ROOT/bun.lock" ]] && pkg_manager="bun"
+
+    # Still need to detect the underlying tool for JSON output
+    # Check if it's biome or eslint underneath
+    if has_file "biome.json" || has_file "biome.jsonc"; then
+      tool="biome"
+      cmd="npx @biomejs/biome check --reporter=json"
+      fix_cmd="npx @biomejs/biome check --write"
+      config="$(ls "$PROJECT_ROOT"/biome.json* 2>/dev/null | head -1)"
+    elif has_glob "eslint.config.*" || has_glob ".eslintrc*"; then
+      tool="eslint"
+      cmd="npx eslint --format json"
+      fix_cmd="npx eslint --fix"
+      config="$(ls "$PROJECT_ROOT"/eslint.config.* "$PROJECT_ROOT"/.eslintrc* 2>/dev/null | head -1)"
+    else
+      # Use the npm script directly (no JSON output guaranteed)
+      tool="npm-script"
+      cmd="$pkg_manager run lint"
+      fix_cmd="$pkg_manager run lint -- --fix"
+      config="package.json"
+    fi
+    echo "TOOL=$tool"
+    echo "COMMAND=$cmd"
+    echo "FIX_COMMAND=$fix_cmd"
+    echo "CONFIG=$config"
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=$fallback"
+    return 0
+  fi
+
+  # 2. Explicit eslint config
+  if has_glob "eslint.config.*" || has_glob ".eslintrc*"; then
+    config="$(ls "$PROJECT_ROOT"/eslint.config.* "$PROJECT_ROOT"/.eslintrc* 2>/dev/null | head -1)"
+    echo "TOOL=eslint"
+    echo "COMMAND=npx eslint --format json"
+    echo "FIX_COMMAND=npx eslint --fix"
+    echo "CONFIG=$config"
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 3. Explicit biome config
+  if has_file "biome.json" || has_file "biome.jsonc"; then
+    config="$(ls "$PROJECT_ROOT"/biome.json* 2>/dev/null | head -1)"
+    echo "TOOL=biome"
+    echo "COMMAND=npx @biomejs/biome check --reporter=json"
+    echo "FIX_COMMAND=npx @biomejs/biome check --write"
+    echo "CONFIG=$config"
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 4. devDependencies detection
+  if pkg_has_dep "eslint"; then
+    echo "TOOL=eslint"
+    echo "COMMAND=npx eslint --format json"
+    echo "FIX_COMMAND=npx eslint --fix"
+    echo "CONFIG="
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  if pkg_has_dep "@biomejs/biome"; then
+    echo "TOOL=biome"
+    echo "COMMAND=npx @biomejs/biome check --reporter=json"
+    echo "FIX_COMMAND=npx @biomejs/biome check --write"
+    echo "CONFIG="
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 5. Fallback: JS/TS files present but no linter configured
+  # Use Biome as the default — it handles both JS and TS natively with zero config.
+  # ESLint can't parse TypeScript without @typescript-eslint/parser, which is rarely
+  # installed in unconfigured projects. Biome works via npx with no plugins needed.
+  if has_glob "*.js" || has_glob "*.ts" || has_glob "*.jsx" || has_glob "*.tsx" \
+    || has_glob "src/*.js" || has_glob "src/*.ts" || has_glob "src/*.tsx" || has_glob "src/*.jsx" \
+    || has_glob "lib/*.js" || has_glob "lib/*.ts" || has_glob "app/*.js" || has_glob "app/*.ts"; then
+    echo "TOOL=biome"
+    echo "COMMAND=npx --yes @biomejs/biome check --reporter=json"
+    echo "FIX_COMMAND=npx --yes @biomejs/biome check --write"
+    echo "CONFIG="
+    echo "LANGUAGE=javascript"
+    echo "FALLBACK=true"
+    return 0
+  fi
+
+  return 1
+}
+
+detect_python() {
+  local tool="" cmd="" fix_cmd="" config="" fallback="false"
+
+  # 1. Explicit ruff config
+  if has_file "ruff.toml" || has_file ".ruff.toml"; then
+    config="$(ls "$PROJECT_ROOT"/ruff.toml "$PROJECT_ROOT"/.ruff.toml 2>/dev/null | head -1)"
+    echo "TOOL=ruff"
+    echo "COMMAND=ruff check --output-format json"
+    echo "FIX_COMMAND=ruff check --fix"
+    echo "CONFIG=$config"
+    echo "LANGUAGE=python"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 2. pyproject.toml with [tool.ruff]
+  if pyproject_has_section "tool.ruff"; then
+    echo "TOOL=ruff"
+    echo "COMMAND=ruff check --output-format json"
+    echo "FIX_COMMAND=ruff check --fix"
+    echo "CONFIG=$PROJECT_ROOT/pyproject.toml"
+    echo "LANGUAGE=python"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 3. pylint config
+  if has_file ".pylintrc" || pyproject_has_section "tool.pylint"; then
+    config=""
+    has_file ".pylintrc" && config="$PROJECT_ROOT/.pylintrc"
+    [[ -z "$config" ]] && config="$PROJECT_ROOT/pyproject.toml"
+    echo "TOOL=pylint"
+    echo "COMMAND=pylint --output-format=json"
+    echo "FIX_COMMAND="
+    echo "CONFIG=$config"
+    echo "LANGUAGE=python"
+    echo "FALLBACK=false"
+    return 0
+  fi
+
+  # 4. Fallback: .py files present (check common project layouts)
+  # Use the skill's default ruff config for comprehensive analysis out of the box.
+  # Include src/*/*.py for standard Python src layout (src/package_name/*.py)
+  if has_glob "*.py" || has_glob "src/*.py" || has_glob "src/*/*.py" \
+    || has_glob "app/*.py" || has_glob "app/*/*.py" \
+    || has_glob "lib/*.py" || has_glob "tests/*.py" || has_glob "test/*.py"; then
+    echo "TOOL=ruff"
+    echo "COMMAND=uvx ruff check --config $DEFAULTS_DIR/ruff.toml --output-format json"
+    echo "FIX_COMMAND=uvx ruff check --config $DEFAULTS_DIR/ruff.toml --fix"
+    echo "CONFIG=$DEFAULTS_DIR/ruff.toml"
+    echo "LANGUAGE=python"
+    echo "FALLBACK=true"
+    return 0
+  fi
+
+  return 1
+}
+
+# --- Type Checker Detection ---
+detect_type_checker() {
+  local lang="$1"
+
+  case "$lang" in
+    python)
+      # Check for explicit pyright config
+      if has_file "pyrightconfig.json" || pyproject_has_section "tool.pyright"; then
+        echo "TYPE_CHECKER=pyright"
+        echo "TYPE_CHECK_COMMAND=npx pyright --outputjson"
+        return 0
+      fi
+      # Fallback: pyright works zero-config on any Python project
+      echo "TYPE_CHECKER=pyright"
+      echo "TYPE_CHECK_COMMAND=npx pyright --outputjson"
+      ;;
+    javascript)
+      # TypeScript projects have tsconfig.json
+      if has_file "tsconfig.json"; then
+        echo "TYPE_CHECKER=tsc"
+        echo "TYPE_CHECK_COMMAND=npx tsc --noEmit"
+        return 0
+      fi
+      # Plain JS without TypeScript — no type checker
+      echo "TYPE_CHECKER=none"
+      echo "TYPE_CHECK_COMMAND="
+      ;;
+    *)
+      echo "TYPE_CHECKER=none"
+      echo "TYPE_CHECK_COMMAND="
+      ;;
+  esac
+}
+
+# --- Main ---
+# Capture output and exit code in a single call (avoid running detection twice)
+OUTPUT=""
+if OUTPUT="$(detect_javascript 2>/dev/null)"; then
+  :
+elif OUTPUT="$(detect_python 2>/dev/null)"; then
+  :
+else
+  echo "TOOL=none"
+  echo "COMMAND="
+  echo "FIX_COMMAND="
+  echo "CONFIG="
+  echo "LANGUAGE=unknown"
+  echo "TYPESCRIPT=false"
+  echo "FALLBACK=true"
+  echo "PROJECT_ROOT=$PROJECT_ROOT"
+  echo "TYPE_CHECKER=none"
+  echo "TYPE_CHECK_COMMAND="
+  echo "FILES="
+  echo "FRAMEWORK=$(detect_framework "$PROJECT_ROOT")"
+  echo "ESLINT_DEFAULTS_CMD=bash $SCRIPT_DIR/eslint-defaults.sh"
+  echo "COGNITIVE_COMMAND="
+  if command -v uvx >/dev/null 2>&1; then
+    echo "SEMGREP_AVAILABLE=true"
+    echo "SECRETS_TOOL=detect-secrets"
+  elif command -v gitleaks >/dev/null 2>&1; then
+    echo "SEMGREP_AVAILABLE=false"
+    echo "SECRETS_TOOL=gitleaks"
+  else
+    echo "SEMGREP_AVAILABLE=false"
+    echo "SECRETS_TOOL=none"
+  fi
+  exit 1
+fi
+
+echo "$OUTPUT"
+echo "PROJECT_ROOT=$PROJECT_ROOT"
+
+# Detect type checker based on language
+LANG_LINE="$(echo "$OUTPUT" | grep "^LANGUAGE=")"
+DETECTED_LANG="${LANG_LINE#LANGUAGE=}"
+detect_type_checker "$DETECTED_LANG"
+
+# TypeScript signal — emitted for any JS project that has a tsconfig.json so
+# Focused cycle checks can pick the right madge flags without re-detecting.
+if [[ "$DETECTED_LANG" == "javascript" ]] && has_file "tsconfig.json"; then
+  echo "TYPESCRIPT=true"
+else
+  echo "TYPESCRIPT=false"
+fi
+
+# Changed files
+if [[ "$CHANGED_ONLY" == "true" ]]; then
+  LANG_LINE="$(echo "$OUTPUT" | grep "^LANGUAGE=")"
+  LANG="${LANG_LINE#LANGUAGE=}"
+  case "$LANG" in
+    javascript) FILES="$(get_changed_files "js ts jsx tsx mjs cjs")" ;;
+    python)     FILES="$(get_changed_files "py pyi")" ;;
+    *)          FILES="" ;;
+  esac
+  echo "FILES=$FILES"
+else
+  echo "FILES="
+fi
+
+# Framework hint used by Architecture Review.
+echo "FRAMEWORK=$(detect_framework "$PROJECT_ROOT")"
+
+# --- Cognitive complexity for Lint and Architecture Review ---
+# Build a per-language command that produces cognitive complexity findings.
+# JS/TS: ESLint + eslint-plugin-sonarjs via the bundled wrapper.
+# Python: flake8 + flake8-cognitive-complexity via uvx (text output, regex-parsed).
+ESLINT_DEFAULTS_CMD="bash $SCRIPT_DIR/eslint-defaults.sh"
+echo "ESLINT_DEFAULTS_CMD=$ESLINT_DEFAULTS_CMD"
+
+case "$DETECTED_LANG" in
+  javascript)
+    # JSON for --rule is wrapped in single quotes so a downstream `eval` of this
+    # COGNITIVE_COMMAND preserves the JSON as a single argument (avoids brace
+    # expansion of '{' and '['). Use the bundled eslint.config.js which loads
+    # eslint-plugin-sonarjs.
+    echo "COGNITIVE_COMMAND=$ESLINT_DEFAULTS_CMD --no-config-lookup --config $DEFAULTS_DIR/eslint.config.js --rule '{\"complexity\":[\"warn\",10],\"sonarjs/cognitive-complexity\":[\"warn\",15]}' --format json"
+    ;;
+  python)
+    echo "COGNITIVE_COMMAND=uvx --with flake8-cognitive-complexity flake8 --select=CCR001 --max-cognitive-complexity=15"
+    ;;
+  *)
+    echo "COGNITIVE_COMMAND="
+    ;;
+esac
+
+# --- Security Scan ---
+# Semgrep runs via uvx (zero-install). Mark availability based on uvx presence.
+if command -v uvx >/dev/null 2>&1; then
+  echo "SEMGREP_AVAILABLE=true"
+else
+  echo "SEMGREP_AVAILABLE=false"
+fi
+
+# Secret scanner: prefer detect-secrets (uvx, zero-install), fall back to gitleaks
+# if the user has it installed locally. Documented alternatives in references/secrets.md.
+if command -v uvx >/dev/null 2>&1; then
+  echo "SECRETS_TOOL=detect-secrets"
+elif command -v gitleaks >/dev/null 2>&1; then
+  echo "SECRETS_TOOL=gitleaks"
+else
+  echo "SECRETS_TOOL=none"
+fi

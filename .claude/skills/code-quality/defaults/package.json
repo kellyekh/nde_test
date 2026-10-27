@@ -1,0 +1,16 @@
+{
+  "name": "code-quality-skill-defaults",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bundled ESLint + sonarjs plugin for Lint and Architecture Review complexity checks. Not used as the general JS/TS fallback; Biome remains that fallback.",
+  "devDependencies": {
+    "eslint": "^9.18.0",
+    "eslint-plugin-sonarjs": "^3.0.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "typescript-eslint": "^8.20.0"
+  },
+  "overrides": {
+    "minimatch": "^10.2.3"
+  }
+}

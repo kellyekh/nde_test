@@ -1,0 +1,96 @@
+---
+name: codeStructure
+description: This details the structure of the codebase and how we organize our code. It also includes information about the folder structure and the naming convention for the different components of the application. Please follow it when writing code.
+---
+
+# Overview
+
+The codebase is organized into different folders and files. The folder structure is as follows:
+
+
+- dist - this is the folder that contains the built files for the project, such as the JavaScript bundle and the CSS files.
+- public - this is the folder that contains the static assets for the project, such as images, fonts, and CSS files.
+- src - This is the main folder for the codebase. It contains the following folders:
+  - common - This folder contains common components that are used across different pages and components.
+    - components - This folder contains reusable components that are used across different pages and components.
+    - hooks - This folder contains reusable hooks that are used across different pages and components.
+    - utils - This folder contains reusable utility functions that are used across different pages and components.
+    - api.js - This file contains the API helpers we use in the applicaion but we are moving away from this approach to use the supabase client instead.
+  - layout - This folder contains the layout components for the different pages of the application.
+    - authenticatedrootlayout.jsx - This file contains the layout component for the authenticated root page of the application.
+    - applayout.jsx - This file contains the layout component for the whole application, both authenticated and unauthenticated.
+    - noauthlayout.jsx - This file contains the layout component for the unauthenticated pages of the application.
+    - storelayout.jsx - This file contains another layout component for the application.
+  - pages - This folder contains the different feature areas of the application organized into folders. The folders are as follows:
+    - communications - This folder contains the different communications features of the application, such as email and postal communications. It also includes the marketing automations feature.
+      - automations - This folder contains the marketing automations feature.
+        - automationdetailpage - This folder contains the detail page for the marketing automation.
+        - automationspage - This folder contains the list page for the marketing automations and allows you to create new marketing automations.
+      - campaigns - This folder contains the email and postal campaigns feature.
+      - email - This folder contains the email communications feature.
+        - emailcreateeditpage - This folder contains the editor to create and edit the content of a specific email.
+        - emaildetailspage - This folder contains the detail page for a specific email communication.
+        - emailspage - This folder contains the list page for the email communications and allows you to create new email communications.
+        - emailtemplatebuilder - This folder contains the email template builder to create reusable email templates.
+        - emailtemplatespage - This folder contains the list page for the email templates and allows you to create new email templates.
+      - lists - This folder contains the communications list feature. Lists are used to send emails to a group of contacts.
+        - listdetailspage - This folder contains the detail page for a specific list. It also includes the list builder to create and edit the contacts of a specific list.
+        - listspage - This folder contains the list page for the lists and allows you to create new lists.
+      - mail - This folder contains the mail communications feature.
+        - maildetailspage - This folder contains the detail page for a specific mail communication.
+        - maileditcreatepage - This folder contains the editor to create and edit the content of a specific mail.
+        - mailspage - This folder contains the list page for the mail communications and allows you to create new mail communications.
+        - mailtemplatebuilder - This folder contains the mail template builder to create reusable mail templates.
+        - mailtemplatespage - This folder contains the list page for the mail templates and allows you to create new mail templates.
+      - configuration - This folder contains the application configuration feature.
+        - configuration - This folder contains the configuration page for the application configuration.
+        - import - This lists the imports that have been taken into the application.
+        - importdetail - This allows you to import data inot the application.
+      - contactdetailspage - This folder contains the detail page for a specific contact.
+        - components - This folder contains the components for the contact details page.
+      - contacts - This folder contains the contacts feature.
+      - donations - This folder contains the donations feature for much of the donation functionality.
+        - batchentry - This page lists the batches that have been created and allows you to create new batches
+        - batchentrydetail - This page allows you to edit a specific batch
+        - donationpageeditor - this page allows you to edit a speicifc donation page
+        - donationpages - this page lists the donation pages that have been created and allows you to create new donation pages
+        - donationpagetemplate - This is the code for the actual donation page that is used in the donation pages
+        - transacitons - This page lists the transactions that have been made in the system
+      - profile - This folder contains the profile feature.
+      - reciepts - This folder contains the reciepts functionality. There are two typed of receipts 1. Instant receipts which are sent to the donor immediatedly and 2. Consolidated receipts which are sent to the donor at the end of the year.
+        - consolidatedreceipts - This page lists the consolidated reciepts that have been created
+        - instantreceipts - This page lists the instant reciepts that have been created
+        - receiptautomationdetail - This page allows you to edit a specific receipt automation
+        - receiptautomations - This page lists the receipt automations that have been created and allows you to create new receipt automations
+        - receiptemailtemplatebuilder - This page allows you to create a new email template for a specific receipt
+        - receiptemailtemplates - This page lists the email templates that have been created for receipts and allows you to create new email templates for receipts
+       - receiptmailtemplatebuilder - This page allows you to create a new mail template for a specific receipt
+       - receiptmailtemplates - This page lists the mail templates that have been created for receipts and allows you to create new mail templates for receipts
+       - receiptpreview - This page allows you to preview a specific receipt and resend it if needed
+       - receiptsledger - This page lists the receipts that have been created and their status
+      - reports - This folder contains the reporting functionality.
+        - createreportpage - This page allows you to create a new report
+        - reportspage - This page lists the reports that have been created and allows you to create new reports as well as favorite reports
+        - singlereport - This page allows you to view a specific report
+      - taskspage - This folder contains the tasks page.
+- tests -  this includes some setup files for playwright and the reports folder which contains the reports for the tests
+- supabase -  this is the local instance of supabase but we don't really use it for much
+- .dockerignore - this is the file that tells docker to ignore certain files
+- .env - this is the file that contains the environment variables for the project
+- .env.sentry-build-plugin - this is the file that contains the environment variables for the sentry build plugin
+- .gitignore - this is the file that tells git to ignore certain files
+- .nycrc.json - this is the file that configures the nyc code coverage tool but we don't use it
+- .docker-compose.yml - this is the file that configures the docker compose for the project. You can use Docker Compose to run the project in a containerized environment if you want to.
+- DOCKER.md - this is the file that contains the instructions for running the project in a containerized environment using Docker.
+- Dockerfile - this is the file that contains the instructions for building the Docker image for the project.
+- Dockerfile.dev - this is the file that contains the instructions for building the Docker image for the project in development mode locally.
+- index.html - this is the file that contains the HTML code for the project's landing page.
+- package.json - this is the file that contains the project's dependencies and scripts.
+- package-lock.json - this is the file that contains the project's dependencies and scripts.
+- playwright.config.js - this is the file that configures the Playwright testing framework.
+- playwright-ct.config.js - this is the configuration for unit testing with Playwright.
+- postcss.config.js - this is the file that configures the PostCSS CSS preprocessor.
+- README.md - this is the file that contains the project's README.
+- tailwind.config.js - this is the file that configures the Tailwind CSS framework.
+- tsconfig.json - this is the file that configures the TypeScript compiler.
+- webpack.config.js - this is the file that configures the Webpack build tool.
