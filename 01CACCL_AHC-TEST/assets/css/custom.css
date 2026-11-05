@@ -1044,3 +1044,36 @@ nde-view-it-section button.cdl-button:focus-visible {
     outline: 3px solid #003e5a;
     outline-offset: 2px;
 }
+
+/* --------------------------------------------------------------------
+   Record page, signed in after clicking View: the "PDF chapters" title
+   in Digital Versions becomes NDE's link to open the viewer
+   (button.btn-as-link), but looks like a plain title. Bold, larger and
+   underlined so it reads as the thing to click, with a larger viewer
+   icon beside it. Signed out the title is a plain span, so this only
+   applies once the files are unlocked.
+   -------------------------------------------------------------------- */
+nde-view-it-section .view-it-text:has(> button.btn-as-link) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+nde-view-it-section .view-it-text button.btn-as-link {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #003e5a !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+}
+nde-view-it-section .view-it-text button.btn-as-link:hover {
+    color: #002a3d !important;
+    text-decoration-thickness: 2px !important;
+}
+nde-view-it-section .view-it-text button.btn-as-link:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] mat-icon {
+    width: 28px !important;
+    height: 28px !important;
+}

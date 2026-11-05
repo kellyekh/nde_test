@@ -25,3 +25,9 @@ NDE's only Sign In button on the record is far down the page in **Requests**. Th
 ## Signed in: View button
 
 Once signed in, NDE replaces the lock message with our CDL label ("You're all set to view this item...") and a **View** button (`button.cdl-button`). CSS only: the button is restyled to match the Sign in button (filled `#003e5a`, 16px bold, 40px tall) and the message is 16px medium. See *Record page, signed in: "View" button for controlled digital files* in `custom.css`.
+
+## Signed in, after View: PDF chapters link
+
+After clicking View, the "PDF chapters" title becomes NDE's link to open the viewer (`button.btn-as-link`) with a viewer icon beside it. CSS makes the link 18px bold, dark blue and underlined, and the icon 28px, so it reads as the thing to click. See *Record page, signed in after clicking View* in `custom.css`.
+
+The instructions under it ("Click **PDF chapters** above...") come from the Alma label, not code.
