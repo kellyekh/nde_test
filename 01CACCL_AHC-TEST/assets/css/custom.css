@@ -902,7 +902,7 @@ nde-request-card button.request-button:focus-visible {
     gap: 8px;
     height: 40px;
     padding: 0 20px;
-    border-radius: 20px;
+    border-radius: 9999px;
     background-color: #003e5a;
     color: #fff !important;
     font-size: 16px;
@@ -960,6 +960,87 @@ nde-requests .ahc-no-requests-help a:hover {
     color: #002a3d;
 }
 nde-requests .ahc-no-requests-help a:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------
+   Record page, signed out: Sign in button under the lock message in
+   Digital Versions (added by custom.js). Same 16px medium text and
+   filled brand-blue button as the Requests sign-in notice.
+   -------------------------------------------------------------------- */
+nde-view-it-section .ahc-dv-locked .mat-body-medium {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1b1b20;
+}
+nde-view-it-section .ahc-dv-signin {
+    margin-top: 8px;
+}
+nde-view-it-section .ahc-dv-signin-button {
+    background-color: #003e5a;
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    padding: 0 20px;
+    height: 40px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+nde-view-it-section .ahc-dv-signin-button svg {
+    width: 20px;
+    height: 20px;
+}
+nde-view-it-section .ahc-dv-signin-button svg path {
+    fill: #fff;
+}
+nde-view-it-section .ahc-dv-signin-button:hover {
+    background-color: #002a3d;
+}
+nde-view-it-section .ahc-dv-signin-button:focus-visible {
+    outline: 3px solid #003e5a;
+    outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------
+   Record page, signed in: "View" button for controlled digital files
+   (NDE's .cdl-button) in Digital Versions. Filled brand-blue with a
+   16px bold label, matching the signed-out Sign in button above, and
+   16px medium message text (the CDL label, edited in Alma).
+   -------------------------------------------------------------------- */
+nde-view-it-section .cdl-message {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+nde-view-it-section .cdl-message .mat-body-medium {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #1b1b20;
+}
+nde-view-it-section button.cdl-button {
+    background-color: #003e5a !important;
+    color: #fff !important;
+    border-radius: 9999px !important;
+    padding: 0 24px !important;
+    height: 40px !important;
+}
+nde-view-it-section button.cdl-button .mdc-button__label {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    white-space: nowrap;
+}
+nde-view-it-section button.cdl-button:hover {
+    background-color: #002a3d !important;
+}
+nde-view-it-section button.cdl-button:focus-visible {
     outline: 3px solid #003e5a;
     outline-offset: 2px;
 }

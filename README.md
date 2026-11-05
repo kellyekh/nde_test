@@ -27,6 +27,7 @@ backups/                   Earlier snapshots of the view's package
 docs/                      Notes and reference material (never uploaded)
 ├── customization-package-guide.md   Ex Libris's guide to the assets folder structure
 ├── requests-section-customizations.md
+├── digital-versions-signin.md
 └── showDirectives.txt
 design/                    Source logos and SVGs; drafts/ holds older homepage background versions
 ```

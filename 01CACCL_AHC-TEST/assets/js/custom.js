@@ -886,3 +886,83 @@
   var observer = new MutationObserver(trySetup);
   observer.observe(document.body, { childList: true, subtree: true });
 })();
+
+/* ============================================================
+   Full record — Sign in button for locked Digital Versions
+   ============================================================
+   Signed out, records with controlled digital files (e.g. PDF
+   chapters) show a lock icon and our Alma label "Please sign in to
+   unlock these free PDF chapters..." under Digital Versions -- but the
+   only Sign In button is NDE's, far down the page in Requests. This
+   adds a Sign in button right under the lock message.
+
+   The button doesn't do its own login: it clicks NDE's Sign In button
+   (nde-login in Requests), so people get the normal sign-in flow. If
+   that button isn't on the page (e.g. already signed in), our button is
+   removed.
+
+   The message is found by its Lock icon, not its wording, so the label
+   can be edited in Alma freely.
+
+   Same SPA caveat as above: a MutationObserver re-applies the button
+   when NDE re-renders the record. */
+
+(function () {
+  var LOCK_ICON = 'nde-view-it-section mat-icon[data-mat-icon-name="Lock"]';
+  var NDE_SIGNIN = 'nde-login button';
+  var BUTTON_TEXT = 'Sign in';
+  var BUTTON_LABEL = 'Sign in to unlock these digital files';
+
+  function buildButton() {
+    var wrap = document.createElement('div');
+    wrap.className = 'ahc-dv-signin';
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'ahc-dv-signin-button';
+    // Reuse the Login icon from NDE's own Sign In button, if it has one.
+    var ndeIcon = document.querySelector(NDE_SIGNIN + ' mat-icon svg');
+    if (ndeIcon) {
+      var icon = ndeIcon.cloneNode(true);
+      icon.setAttribute('aria-hidden', 'true');
+      icon.setAttribute('focusable', 'false');
+      button.append(icon);
+    }
+    var text = document.createElement('span');
+    text.textContent = BUTTON_TEXT;
+    button.append(text);
+    button.setAttribute('aria-label', BUTTON_LABEL);
+    button.addEventListener('click', function () {
+      var ndeButton = document.querySelector(NDE_SIGNIN);
+      if (ndeButton) ndeButton.click();
+    });
+    wrap.append(button);
+    return wrap;
+  }
+
+  function trySetup() {
+    var signedOut = !!document.querySelector(NDE_SIGNIN);
+    var icons = document.querySelectorAll(LOCK_ICON);
+
+    // Remove buttons whose lock message has gone, or once signed in.
+    var buttons = document.querySelectorAll('.ahc-dv-signin');
+    for (var b = 0; b < buttons.length; b++) {
+      var prev = buttons[b].previousElementSibling;
+      if (!signedOut || !prev || !prev.querySelector('mat-icon[data-mat-icon-name="Lock"]')) {
+        buttons[b].remove();
+      }
+    }
+    if (!signedOut) return;
+
+    for (var i = 0; i < icons.length; i++) {
+      var row = icons[i].parentElement;
+      row.classList.add('ahc-dv-locked');
+      var next = row.nextElementSibling;
+      if (!next || !next.classList.contains('ahc-dv-signin')) row.after(buildButton());
+    }
+  }
+
+  trySetup();
+
+  var observer = new MutationObserver(trySetup);
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
