@@ -981,7 +981,7 @@
 
 (function () {
   var LINKS = [
-    { text: 'What am I searching?', href: 'https://libguides.hancockcollege.edu/librarycatalog' },
+    { text: 'What am I searching?', href: 'https://libguides.hancockcollege.edu/onesearch' },
     { text: 'Ask a librarian',      href: 'https://www.hancockcollege.edu/library/ask-a-librarian.php' }
   ];
 

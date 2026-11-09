@@ -1086,7 +1086,7 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   color: #ffffff;
   /* !important on size and weight: Primo's own h1 style (40px,
      semi-bold) otherwise wins. Regular weight, per library staff. */
-  font-size: 1.375rem !important;   /* 22px on phones */
+  font-size: 1.5rem !important;   /* 24px on phones */
   font-weight: 400 !important;
   line-height: 1.15;
 }
@@ -1095,7 +1095,7 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   .custom-search-bar-container h1 {
     width: clamp(288px, calc(88.4254% - 28.3px), 848px) !important;
     padding: 0 !important;
-    font-size: 1.5rem !important;   /* 24px */
+    font-size: 1.75rem !important;   /* 28px */
   }
 }
 
@@ -1103,7 +1103,7 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   .custom-search-bar-container h1 {
     width: clamp(912px, calc(85% - 27.2px), 1088px) !important;
     padding: 0 !important;
-    font-size: 1.5rem !important;
+    font-size: 1.75rem !important;
   }
 }
 
@@ -1111,7 +1111,7 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   .custom-search-bar-container h1 {
     width: clamp(1088px, calc(85% - 27.2px), 1368px) !important;
     padding: 0 !important;
-    font-size: 1.5rem !important;
+    font-size: 1.75rem !important;
   }
 }
 
