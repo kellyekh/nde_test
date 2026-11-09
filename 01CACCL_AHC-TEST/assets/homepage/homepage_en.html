@@ -71,16 +71,6 @@
 
     <div class="flex-row flex-layout-space-between width-100 welcome-announcements-container">
       <div class="welcome display-flex flex-column flex-layout-start">
-        <h2 aria-level="2" role="heading" class="welcome-title mat-headline-medium ">Start Your Search Here</h2>
-        <span class="welcome-content">
-          Find books, articles, videos, and more for your classes, all in one place.
-          New to library searching? Check out <strong>Search Tips</strong> to get started.
-          Still have questions? Ask a librarian. No question is too small!</span>
-        <a id="ask_a_librarian_link" tabindex="0" aria-label="Ask a Librarian" role="link"
-          href="https://www.hancockcollege.edu/library/ask-a-librarian.php" style="text-decoration: none">
-          Ask a Librarian
-        </a>
-
         <section class="book-slider" aria-roledescription="carousel" aria-label="Featured books from the New Books collection">
           <div class="book-slider-header">
             <h2 class="book-slider-title">Check out something new</h2>
@@ -126,29 +116,34 @@
         -->
       </div>
 
-      <div class="featured-collection-card">
-        <a
-          href="https://caccl-ahc.primo.exlibrisgroup.com/nde/collectionDiscovery?collectionId=81120680550005262&vid=01CACCL_AHC:TEST&lang=en"
-          class="featured-collection-link"
-        >
-          <img
-            src="https://www.hancockcollege.edu/library/_images/discovery/hispamcoll.png"
-            alt="Hispanic American Heritage Collection"
-            class="featured-collection-image"
-          />
-          <div class="featured-collection-body">
-            <h2 class="featured-collection-title">
-              Let's Celebrate!
-            </h2>
-            <p class="featured-collection-description">
-              A curated collection highlighting Hispanic American history, culture, and contributions.
-            </p>
-            <p class="featured-collection-cta">
-              Explore the collection
-            </p>
-          </div>
-        </a>
-      </div>
+      <section class="featured-collection" aria-labelledby="featured-collection-heading">
+        <div class="book-slider-header">
+          <h2 class="book-slider-title" id="featured-collection-heading">Featured collection</h2>
+        </div>
+        <div class="featured-collection-card">
+          <a
+            href="https://caccl-ahc.primo.exlibrisgroup.com/nde/collectionDiscovery?collectionId=81120680550005262&vid=01CACCL_AHC:TEST&lang=en"
+            class="featured-collection-link"
+          >
+            <img
+              src="https://www.hancockcollege.edu/library/_images/discovery/hispamcoll.png"
+              alt="Hispanic American Heritage Collection"
+              class="featured-collection-image"
+            />
+            <div class="featured-collection-body">
+              <h3 class="featured-collection-title">
+                Let's Celebrate!
+              </h3>
+              <p class="featured-collection-description">
+                A curated collection highlighting Hispanic American history, culture, and contributions.
+              </p>
+              <p class="featured-collection-cta">
+                Explore the collection
+              </p>
+            </div>
+          </a>
+        </div>
+      </section>
     </div>
 
   </div>

@@ -24,11 +24,6 @@ display: none !important;
 }
 
 /*Search Customization */
-.container .custom-search-bar-container {
-  background-color: #003E5A;
-  height: 10rem !important;
-}
-
 .top-bar-background-image {
   padding-top: 30px;
   padding-bottom: 30px;
@@ -110,7 +105,7 @@ display: none !important;
   .main-landing-page {
     gap: 2.5rem !important;
   }
-  .featured-collection-card {
+  .featured-collection {
     width: 100%;
   }
 }
@@ -148,18 +143,10 @@ display: none !important;
   }
 }
 
-.custom-search-bar-container h1 {
-  display: none !important;
-}
-
 .custom-search-bar-container .background-overlay {
 display: none;
 }
 
-.container .custom-search-bar-container {
-  background-color: #003E5A;
-  height: 15rem;
-}
 .mat-title-medium, .mat-typography .mat-title-medium {
   color:#003E5A;
   font-size: 28px !important;
@@ -185,21 +172,6 @@ display: none;
   rect{
     fill: none;}
   }
-
-  /*Sign-in container */
-  .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
-    background-color: yellow;
-  }
-
-  :root .nde-overrides {
-    --mdc-snackbar-container-color: yellow;
-  }
-
-.mat-snack-bar-container .mat-mdc-snack-bar-container {
-  position: static; 
-  margin-top: 0px; 
-  margin-right: 0px;
-}
 
 /*Footer styling */
 #footer{
@@ -364,15 +336,23 @@ footer {
 
 /* Fixed width (rather than sized by content) so the Welcome column
    beside it can't squeeze it narrow. */
-.featured-collection-card {
+/* Featured collection: heading + card, sized and spaced like the
+   "Check out something new" slider beside it, so the two titles and
+   the image/cover tops line up. */
+.featured-collection {
   flex: 0 0 auto;
   width: 20rem;
   max-width: 100%;
+  margin-top: 1rem;   /* matches .welcome's 16px top padding */
+}
+
+.featured-collection-card {
+  width: 100%;
   border: 1px solid #d9d9d9;
   border-radius: 8px;
   overflow: hidden;
   font-family: inherit;
-  margin: 1rem 0;
+  margin: 0;
 }
 
 .featured-collection-link {
@@ -1076,4 +1056,292 @@ nde-view-it-section .view-it-text button.btn-as-link:focus-visible {
 nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] mat-icon {
     width: 28px !important;
     height: 28px !important;
+}
+
+
+/* ============================================================
+   Homepage search banner: OneSearch title + help links
+   (2026-11 UX review)
+   ============================================================ */
+
+/* Navy search banner: grows to fit the title and links
+   (replaces the old fixed 10rem / 15rem heights) */
+.container .custom-search-bar-container {
+  background-color: #003E5A;
+  height: auto !important;
+  min-height: 10rem;
+  padding: 20px 0;
+}
+
+/* "OneSearch" title = Primo's built-in homepage heading (Alma label
+   nde.landing.header). Lined up with the left edge of the scope
+   dropdown; widths mirror Primo's own search-bar container. */
+.custom-search-bar-container h1 {
+  display: block !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 0 auto 4px !important;
+  padding: 0 16px !important;
+  text-align: left !important;
+  color: #ffffff;
+  /* !important on size and weight: Primo's own h1 style (40px,
+     semi-bold) otherwise wins. Regular weight, per library staff. */
+  font-size: 1.375rem !important;   /* 22px on phones */
+  font-weight: 400 !important;
+  line-height: 1.15;
+}
+
+@media (min-width: 600px) and (max-width: 959.98px) {
+  .custom-search-bar-container h1 {
+    width: clamp(288px, calc(88.4254% - 28.3px), 848px) !important;
+    padding: 0 !important;
+    font-size: 1.5rem !important;   /* 24px */
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1279.98px) {
+  .custom-search-bar-container h1 {
+    width: clamp(912px, calc(85% - 27.2px), 1088px) !important;
+    padding: 0 !important;
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .custom-search-bar-container h1 {
+    width: clamp(1088px, calc(85% - 27.2px), 1368px) !important;
+    padding: 0 !important;
+    font-size: 1.5rem !important;
+  }
+}
+
+/* "What am I searching? | Ask a librarian" links (custom.js) */
+.ahc-search-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 8px 0 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ahc-search-links a,
+.ahc-search-links-sep {
+  color: #003e5a;               /* navy on white results/record pages */
+}
+
+.ahc-search-links a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ahc-search-links a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.ahc-search-links a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* White on the homepage's navy banner */
+.ahc-search-links--on-dark a,
+.ahc-search-links--on-dark .ahc-search-links-sep {
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   Sign-in notice as a full-width yellow bar (custom.js moves it
+   under the search area so it no longer covers results).
+   Replaces the old yellow "Sign-in container" rules.
+   ============================================================ */
+
+mat-snack-bar-container.ahc-signin-bar {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+  opacity: 1 !important;
+  background: #FFE45C;            /* warm yellow; text contrast ~15:1 */
+  border-bottom: 1px solid #d9b800;
+}
+
+.ahc-signin-bar .mat-mdc-snackbar-surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  color: #1a1a1a !important;
+}
+
+.ahc-signin-bar .mat-mdc-snack-bar-label {
+  padding: 0 !important;
+  width: 100%;
+}
+
+.ahc-signin-bar nde-custom-snack-bar {
+  display: block;
+  width: 100%;
+}
+
+/* Row: [message + Sign in] ......... [X] */
+.ahc-signin-bar nde-custom-snack-bar > div {
+  display: flex;
+  align-items: center;
+  gap: 8px 16px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1368px;
+  margin: 0 auto;
+  padding: 8px 24px !important;
+}
+
+.ahc-signin-bar .content-container {
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 8px 16px;
+  flex: 1;
+  min-width: 0;
+  order: 1;
+  text-align: left !important;
+}
+
+.ahc-signin-bar .notification-text {
+  flex: 1 1 320px;              /* wraps under the text on phones */
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #1a1a1a !important;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.ahc-signin-bar .notification-text a {
+  color: #003e5a !important;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.ahc-signin-bar nde-login {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.ahc-signin-bar nde-login button {
+  background: #003e5a !important;
+  color: #ffffff !important;
+  border-radius: 20px;
+  padding: 0 16px;
+}
+
+.ahc-signin-bar nde-login button mat-icon,
+.ahc-signin-bar nde-login button svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.ahc-signin-bar .dismiss-btn {
+  /* relative, not static: Primo positions it absolutely, and its hover
+     circle is sized to the nearest positioned ancestor -- static made
+     that circle stretch across the whole page as a grey oval. */
+  position: relative !important;
+  order: 2;
+  flex-shrink: 0;
+  margin: 0 !important;
+  color: #1a1a1a !important;
+}
+
+.ahc-signin-bar nde-login button:focus-visible,
+.ahc-signin-bar .dismiss-btn:focus-visible,
+.ahc-signin-bar a:focus-visible {
+  outline: 2px solid #003e5a;
+  outline-offset: 2px;
+}
+
+
+/* ============================================================
+   LibraryH3lp chat: docked "Chat with a librarian" tab, bottom-left
+   (2026-11 UX review). Replaces the floating speech-bubble icon,
+   which covered homepage tiles and text. custom.js adds the visible
+   label and titles the chat iframe.
+   ============================================================ */
+
+.lh3-chat-widget {
+  top: auto !important;
+  bottom: 16px !important;
+  left: 16px !important;
+  right: auto !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.lh3-chat-widget .lh3-chat-header {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+#lh3-chat-button.lh3-chat-button {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  max-width: none !important;
+  height: 44px !important;
+  padding: 0 18px 0 14px !important;
+  background: #003e5a !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 22px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  font: 600 15px/1 'Noto Sans Display', sans-serif;
+  white-space: nowrap !important;
+  cursor: pointer;
+}
+
+/* Hide the speech-bubble drawing; keep LibraryH3lp's status image
+   as a small dot (green when staff are online). */
+#lh3-chat-button.lh3-chat-button svg {
+  display: none !important;
+}
+
+#lh3-chat-button.lh3-chat-button img {
+  position: static !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#lh3-chat-button.lh3-chat-button:hover {
+  background: #002a3d !important;
+}
+
+#lh3-chat-button.lh3-chat-button:focus-visible {
+  outline: 3px solid #FFE45C;
+  outline-offset: 2px;
+}
+
+/* Open chat window sits just above the tab */
+#lh3-chat-frame.lh3-chat-frame-wrap {
+  top: auto !important;
+  bottom: 72px !important;
+  left: 16px !important;
+  right: auto !important;
 }

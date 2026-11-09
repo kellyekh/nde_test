@@ -966,3 +966,139 @@
   var observer = new MutationObserver(trySetup);
   observer.observe(document.body, { childList: true, subtree: true });
 })();
+
+
+/* ============================================================
+   Help links under the search bar:
+   "What am I searching?  |  Ask a librarian"   (2026-11 UX review)
+   ============================================================
+   Replaces the homepage's "Start Your Search Here" section: these two
+   links sit under the search box on every page (homepage, results,
+   full records). Modeled on UTK's "What am I searching?" link.
+   NDE is a single-page app, so a MutationObserver re-adds the links
+   whenever the search bar re-renders, and flips their color: white on
+   the navy homepage banner, navy on the white results/record header. */
+
+(function () {
+  var LINKS = [
+    { text: 'What am I searching?', href: 'https://libguides.hancockcollege.edu/librarycatalog' },
+    { text: 'Ask a librarian',      href: 'https://www.hancockcollege.edu/library/ask-a-librarian.php' }
+  ];
+
+  function buildLinks() {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'ahc-search-links';
+
+    LINKS.forEach(function (item, i) {
+      if (i > 0) {
+        var sep = document.createElement('span');
+        sep.className = 'ahc-search-links-sep';
+        sep.setAttribute('aria-hidden', 'true'); // screen readers skip the divider
+        sep.textContent = '|';
+        wrapper.appendChild(sep);
+      }
+      var a = document.createElement('a');
+      a.href = item.href;
+      a.textContent = item.text;
+      wrapper.appendChild(a);
+    });
+
+    return wrapper;
+  }
+
+  function addSearchLinks() {
+    var searchBar = document.querySelector('nde-search-bar-presenter');
+    if (!searchBar) return;
+
+    var wrapper = searchBar.querySelector('.ahc-search-links');
+    if (!wrapper) {
+      wrapper = buildLinks();
+      searchBar.appendChild(wrapper);
+    }
+
+    var onHome = window.location.pathname.indexOf('/nde/home') > -1;
+    wrapper.classList.toggle('ahc-search-links--on-dark', onHome);
+  }
+
+  addSearchLinks();
+  new MutationObserver(addSearchLinks).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+})();
+
+
+/* ============================================================
+   Sign-in notice as a full-width yellow bar   (2026-11 UX review)
+   ============================================================
+   Primo shows the "Sign in with your myHancock credentials..." message
+   as a floating pop-up that covers search results. This moves it into
+   the page as a full-width bar under the search area, so it pushes
+   results down instead of covering them. Text, Guide link, Sign in
+   button and close X keep working. Adapted from UTK's NDE view; unlike
+   UTK's, the real notice text is kept so screen readers read it.
+   Styling: .ahc-signin-bar in custom.css. */
+
+(function () {
+  function moveSigninNotice() {
+    var bar = document.querySelector('mat-snack-bar-container');
+    var topBar = document.querySelector('nde-top-bar');
+
+    // Only the sign-in notice (it contains Primo's Sign in button);
+    // leave any other pop-up messages alone.
+    if (!bar || !topBar || !bar.querySelector('nde-login')) return;
+    if (bar.dataset.ahcMoved === 'true') return;
+    bar.dataset.ahcMoved = 'true';
+
+    topBar.insertAdjacentElement('afterend', bar);
+    bar.classList.add('ahc-signin-bar');
+
+    // Primo raises the floating buttons (back to top, feedback) to clear
+    // the pop-up; put them back now that it isn't floating.
+    var side = document.querySelector('.side-bottom-buttons');
+    if (side) side.classList.remove('bumped-above-snackbar');
+
+    // Hide the now-empty floating container.
+    var pane = document.querySelector('.cdk-overlay-pane:empty');
+    if (pane) pane.style.display = 'none';
+  }
+
+  moveSigninNotice();
+  new MutationObserver(moveSigninNotice).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+})();
+
+
+/* ============================================================
+   LibraryH3lp chat: label the docked tab and title the chat frame
+   (2026-11 UX review). Styling is in custom.css (.lh3-chat-widget).
+   Primo re-creates the chat button each time the chat window closes,
+   so a MutationObserver re-applies the label.
+   ============================================================ */
+
+(function () {
+  var LABEL = 'Chat with a librarian';
+
+  function labelChat() {
+    var button = document.getElementById('lh3-chat-button');
+    if (button && !button.querySelector('.ahc-chat-label')) {
+      var text = document.createElement('span');
+      text.className = 'ahc-chat-label';
+      text.textContent = LABEL;
+      button.appendChild(text);
+      button.setAttribute('aria-label', LABEL);
+    }
+
+    // Screen readers announce the chat window by its title.
+    var frame = document.querySelector('.lh3-chat-widget iframe');
+    if (frame && frame.title !== LABEL) frame.title = LABEL;
+  }
+
+  labelChat();
+  new MutationObserver(labelChat).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+})();
