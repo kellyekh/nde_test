@@ -39,6 +39,29 @@ display: none !important;
   background-position: center center !important;
 }
 
+/* Header logo: library-logo.png is the AHC emblem + "LIBRARY"
+   (2026-11), 993x278 (about 5x) so it stays sharp on
+   high-resolution screens. Shown 56px tall in Primo's header. The link
+   is stretched to the logo's height so the keyboard focus outline wraps
+   the whole logo. The phone rule below still overrides the size. */
+nde-logo a {
+  display: inline-flex !important;
+  align-items: center;
+}
+nde-logo img {
+  width: auto !important;
+  height: 56px !important;
+}
+
+/* Breathing room between the header logo and the menu links
+   (New Search, Help, ...), which otherwise butt right up against it.
+   Desktop/tablet only: on phones the menu is a button left of the logo. */
+@media (min-width: 600px) {
+  nde-logo {
+    margin-right: 40px !important;
+  }
+}
+
 /* Phone header: Primo's menu button + our 253px logo + the language/
    account panel, each with 36px margins, add up to ~500px -- wider than
    a phone. That made the whole page scroll sideways, so the banner
@@ -53,8 +76,10 @@ display: none !important;
     margin-left: 8px !important;
   }
   nde-logo img {
-    width: min(253px, calc(100vw - 205px)) !important;
+    width: auto !important;
     height: auto !important;
+    max-height: 44px;
+    max-width: calc(100vw - 205px);
   }
   nde-user-panel.margin-right-huge {
     margin-right: 8px !important;
@@ -1080,6 +1105,9 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   display: block !important;
   box-sizing: border-box;
   width: 100% !important;
+  /* Primo caps this heading at max-width: 85% and centers it, which
+     pushed it ~28px right of the search box on phones. */
+  max-width: none !important;
   margin: 0 auto 4px !important;
   padding: 0 16px !important;
   text-align: left !important;
@@ -1115,13 +1143,49 @@ nde-view-it-section .view-it-text button[aria-label="Display item in viewer"] ma
   }
 }
 
+/* "OneSearch" title, option C (2026-11 design review): larger title with
+   a light-blue search badge, matching the homepage tile icons (#B3C5CE).
+   Stays regular weight, per library staff; overrides the sizes above. The badge is a CSS
+   background image, so screen readers still hear just "OneSearch". */
+.custom-search-bar-container h1 {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  font-weight: 400 !important;
+  font-size: 1.75rem !important;   /* 28px on phones */
+  line-height: 1.1;
+}
+
+.custom-search-bar-container h1::before {
+  content: "";
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #B3C5CE url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003E5A' stroke-width='2.6' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") center / 22px no-repeat;
+}
+
+@media (min-width: 600px) {
+  .custom-search-bar-container h1 {
+    gap: 14px;
+    font-size: 2.25rem !important;   /* 36px */
+  }
+  .custom-search-bar-container h1::before {
+    width: 48px;
+    height: 48px;
+    background-size: 26px;
+  }
+}
+
 /* "What am I searching? | Ask a librarian" links (custom.js) */
 .ahc-search-links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 8px;
-  padding: 8px 0 0 16px;
+  /* No left padding: the links line up with the scope dropdown and the
+     OneSearch heading (they used to sit 16px further in). */
+  padding: 8px 0 0 0;
   font-size: 14px;
   font-weight: 500;
 }
